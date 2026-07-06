@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SwipeUp</string>
+    <string name="title_activity_main">SwipeUp</string>
+    <string name="package_name">com.swipeup.app</string>
+    <string name="custom_url_scheme">com.swipeup.app</string>
+</resources>
