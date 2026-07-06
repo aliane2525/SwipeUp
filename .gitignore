@@ -1,5 +1,40 @@
-node_modules
+# ========================
+# Dependencies
+# ========================
+node_modules/
+Backend/node_modules/
+frontend/node_modules/
+
+# ========================
+# Environment files
+# ========================
 .env
-dist
-build
+Backend/.env
+frontend/.env
+
+# ========================
+# Builds
+# ========================
+build/
+dist/
+frontend/build/
+
+# ========================
+# Logs
+# ========================
+*.log
+npm-debug.log*
+
+# ========================
+# OS files
+# ========================
 .DS_Store
+Thumbs.db
+
+# ========================
+# React / frontend extras
+# ========================
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
