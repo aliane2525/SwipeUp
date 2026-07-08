@@ -4,8 +4,7 @@ const router = express.Router();
 const Moment = require("../models/Moment");
 
 const auth = require("../Middleware/authmiddleware");
-
-const upload = require("../middleware/upload");
+const upload = require("../Middleware/upload");
 
 // ================= CREATE MOMENT =================
 router.post(
