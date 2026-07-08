@@ -14,7 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ================= INPUT HANDLER =================
+  // ================= INPUT =================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -37,17 +37,12 @@ export default function Login() {
 
       const res = await API.post("/api/auth/login", form);
 
-      // ================= SAVE JWT (IMPORTANT) =================
+      // 🔐 SAVE AUTH DATA
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // DEBUG (optional)
-      console.log("TOKEN:", res.data.token);
-
       navigate("/home");
     } catch (err) {
-      console.log(err.response?.data || err.message);
-
       setError(
         "❌ " + (err.response?.data?.message || "Login failed")
       );
@@ -62,52 +57,41 @@ export default function Login() {
       <div style={styles.blur2}></div>
 
       <form style={styles.form} onSubmit={login}>
-        {/* ================= LOGO ================= */}
+        {/* LOGO */}
         <div style={styles.logoBox}>
-          <img
-            src={logo}
-            alt="SwipeUp Logo"
-            style={styles.logoImage}
-          />
-
+          <img src={logo} alt="logo" style={styles.logoImage} />
           <h1 style={styles.logo}>🔥 SwipeUp</h1>
-
-          <p style={styles.subtitle}>
-            💕 Meet new people around you
-          </p>
+          <p style={styles.subtitle}>💖 Meet new people around you</p>
         </div>
 
-        {/* ================= ERROR ================= */}
+        {/* ERROR */}
         {error && <div style={styles.error}>{error}</div>}
 
-        {/* ================= INPUTS ================= */}
+        {/* INPUTS */}
         <input
-          type="email"
           name="email"
-          placeholder="📧 Enter email"
+          type="email"
+          placeholder="📧 Email"
           value={form.email}
           onChange={handleChange}
           style={styles.input}
         />
 
         <input
-          type="password"
           name="password"
-          placeholder="🔒 Enter password"
+          type="password"
+          placeholder="🔒 Password"
           value={form.password}
           onChange={handleChange}
           style={styles.input}
         />
 
-        {/* ================= BUTTON ================= */}
+        {/* BUTTON */}
         <button type="submit" style={styles.button}>
           {loading ? "⏳ Logging in..." : "🚀 Login"}
         </button>
 
-        {/* ================= REGISTER ================= */}
-        <p style={styles.bottomText}>
-          🆕 Don't have an account?
-        </p>
+        <p style={styles.bottomText}>Don't have an account?</p>
 
         <button
           type="button"
@@ -131,17 +115,16 @@ const styles = {
     alignItems: "center",
     background: "linear-gradient(135deg,#ff4458,#ff7b54)",
     position: "relative",
-    overflow: "hidden",
   },
 
   blur1: {
     position: "absolute",
-    width: 350,
-    height: 350,
+    width: 300,
+    height: 300,
     borderRadius: "50%",
-    background: "rgba(255,255,255,0.12)",
-    top: -120,
-    left: -120,
+    background: "rgba(255,255,255,0.15)",
+    top: -100,
+    left: -100,
   },
 
   blur2: {
@@ -155,16 +138,14 @@ const styles = {
   },
 
   form: {
-    width: "90%",
-    maxWidth: 400,
+    width: 380,
     background: "#fff",
-    padding: 35,
-    borderRadius: 28,
+    padding: 30,
+    borderRadius: 25,
     display: "flex",
     flexDirection: "column",
-    gap: 16,
-    zIndex: 10,
-    boxShadow: "0 15px 40px rgba(0,0,0,0.2)",
+    gap: 15,
+    boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
   },
 
   logoBox: {
@@ -172,60 +153,56 @@ const styles = {
   },
 
   logoImage: {
-    width: 120,
-    height: 120,
+    width: 110,
+    height: 110,
     objectFit: "contain",
-    marginBottom: 10,
   },
 
   logo: {
-    margin: 0,
     color: "#ff4458",
-    fontSize: 38,
-    fontWeight: "bold",
+    fontSize: 34,
+    margin: 0,
   },
 
   subtitle: {
     color: "#777",
-    fontSize: 14,
+    fontSize: 13,
   },
 
   error: {
     background: "#ffe5e5",
     color: "#ff2d55",
-    padding: 12,
-    borderRadius: 12,
+    padding: 10,
+    borderRadius: 10,
     textAlign: "center",
   },
 
   input: {
-    padding: 16,
-    borderRadius: 14,
+    padding: 14,
+    borderRadius: 12,
     border: "1px solid #ddd",
-    fontSize: 16,
-    outline: "none",
+    fontSize: 15,
   },
 
   button: {
-    padding: 16,
+    padding: 14,
+    borderRadius: 12,
     border: "none",
-    borderRadius: 14,
     background: "linear-gradient(135deg,#ff4458,#ff7b54)",
     color: "#fff",
-    fontSize: 17,
     fontWeight: "bold",
     cursor: "pointer",
   },
 
   bottomText: {
     textAlign: "center",
-    color: "#666",
     margin: 0,
+    color: "#666",
   },
 
   registerBtn: {
-    padding: 15,
-    borderRadius: 14,
+    padding: 12,
+    borderRadius: 12,
     border: "2px solid #ff4458",
     background: "#fff",
     color: "#ff4458",

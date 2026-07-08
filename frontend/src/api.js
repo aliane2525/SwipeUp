@@ -1,7 +1,11 @@
 import axios from "axios";
 
+const apiBase = (process.env.REACT_APP_API_URL || "https://swipeup-2.onrender.com")
+  .replace(/\/api$/, "")
+  .replace(/\/$/, "");
+
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
+  baseURL: apiBase,
 });
 
 // ✅ attach token to every request

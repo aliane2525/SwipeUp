@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api";
 
 export default function ChatList() {
   const [chats, setChats] = useState([]);
@@ -12,8 +12,7 @@ export default function ChatList() {
       return;
     }
 
-    axios
-      .get(`http://localhost:5000/api/chat/chats/${user._id}`)
+    API.get(`/api/chat/chats/${user._id}`)
       .then((res) => {
         console.log("Chats from backend:", res.data);
         setChats(res.data);

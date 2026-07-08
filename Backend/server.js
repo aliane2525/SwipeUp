@@ -16,12 +16,16 @@ const app = express();
 // ================= MIDDLEWARE =================
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 
 // ================= HTTP SERVER =================
 const server = http.createServer(app);
@@ -29,9 +33,8 @@ const server = http.createServer(app);
 // ================= SOCKET.IO =================
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    ...corsOptions,
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
 
