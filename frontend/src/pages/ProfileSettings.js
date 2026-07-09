@@ -6,12 +6,43 @@ export default function ProfileSettings() {
   const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadUser();
   }, []);
+
+  const uploadPhoto = async () => {
+    if (!image) {
+      alert("Choose an image first");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const formData = new FormData();
+      formData.append("image", image);
+
+      const res = await API.post("/api/user/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setProfileImage(res.data?.user?.profileImage || "");
+      window.dispatchEvent(new Event("profileUpdated"));
+      alert("✅ Photo uploaded successfully");
+    } catch (err) {
+      console.log("UPLOAD ERROR:", err.response?.data || err.message);
+      alert("❌ Photo upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const loadUser = async () => {
     try {
@@ -43,6 +74,7 @@ export default function ProfileSettings() {
       setEmail(res.data?.email || email);
       setProfileImage(res.data?.profileImage || profileImage);
 
+      window.dispatchEvent(new Event("profileUpdated"));
       alert("✅ Profile updated successfully.");
     } catch (err) {
       console.log("SAVE ERROR:", err.response?.data || err.message);
@@ -73,6 +105,19 @@ export default function ProfileSettings() {
           alt="Profile"
           style={styles.avatar}
         />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
+
+        <button
+          onClick={uploadPhoto}
+          disabled={uploading}
+          style={styles.button}
+        >
+          {uploading ? "Uploading..." : "📷 Upload Photo"}
+        </button>
 
         <label style={styles.label}>Name</label>
 

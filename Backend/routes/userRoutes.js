@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const upload = require("../Middleware/upload");
 const auth = require("../Middleware/authmiddleware");
 const User = require("../models/User");
 
@@ -53,5 +53,42 @@ router.get("/all", auth, async (req, res) => {
     res.status(500).json({ message: "Server error loading users" });
   }
 });
+// ================= UPLOAD PROFILE IMAGE =================
+router.post(
+  "/upload",
+  auth,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          message: "No image uploaded",
+        });
+      }
+
+      const user = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+          profileImage: req.file.path,
+        },
+        {
+          new: true,
+        }
+      ).select("-password");
+
+      res.json({
+        message: "Profile image uploaded",
+        user,
+      });
+
+    } catch (err) {
+      console.log("UPLOAD ERROR:", err.message);
+
+      res.status(500).json({
+        message: "Upload failed",
+      });
+    }
+  }
+);
 
 module.exports = router;

@@ -97,6 +97,15 @@ function App() {
         {/* ================================================= */}
 
         <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Matches />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/chat/:roomId"
           element={
             <ProtectedRoute>

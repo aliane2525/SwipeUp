@@ -8,11 +8,6 @@ export default function Home() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
-  // ================= LOAD USERS =================
-  useEffect(() => {
-    loadUsers();
-  }, []);
-
   const loadUsers = async () => {
     try {
       const res = await API.get("/api/user/all");
@@ -21,6 +16,21 @@ export default function Home() {
       console.log("LOAD USERS ERROR:", err);
     }
   };
+
+  // ================= LOAD USERS =================
+  useEffect(() => {
+    const load = () => {
+      loadUsers();
+    };
+
+    load();
+
+    window.addEventListener("profileUpdated", load);
+
+    return () => {
+      window.removeEventListener("profileUpdated", load);
+    };
+  }, []);
 
   // ================= SWIPE =================
   const swipe = async (dir, targetId) => {
@@ -80,6 +90,8 @@ export default function Home() {
         <button onClick={() => navigate("/home")} style={styles.navBtn}>🔥</button>
         <button onClick={() => navigate("/notifications")} style={styles.navBtn}>🔔</button>
         <button onClick={() => navigate("/matches")} style={styles.navBtn}>❤️</button>
+
+  <button onClick={() => navigate("/chat")} style={styles.navBtn}>💬</button>
         <button onClick={() => navigate("/settings")} style={styles.navBtn}>👤</button>
       </div>
     </div>
