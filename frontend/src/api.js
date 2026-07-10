@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiBase = (process.env.REACT_APP_API_URL || "https://swipeup-2.onrender.com")
+const apiBase = (process.env.REACT_APP_API_URL || window.location.origin)
   .replace(/\/api$/, "")
   .replace(/\/$/, "");
 

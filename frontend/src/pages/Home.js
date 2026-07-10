@@ -6,6 +6,7 @@ import logo from "../assets/logo.png";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
+  const [moments, setMoments] = useState([]);
   const navigate = useNavigate();
 
   const loadUsers = async () => {
@@ -17,10 +18,20 @@ export default function Home() {
     }
   };
 
+  const loadMoments = async () => {
+    try {
+      const res = await API.get("/api/moments");
+      setMoments(res.data.slice(0, 3));
+    } catch (err) {
+      console.log("LOAD MOMENTS ERROR:", err);
+    }
+  };
+
   // ================= LOAD USERS =================
   useEffect(() => {
     const load = () => {
       loadUsers();
+      loadMoments();
     };
 
     load();
@@ -42,10 +53,31 @@ export default function Home() {
 
         if (res.data.match) {
           alert("❤️ It's a Match!");
+          if (res.data.chatId) {
+            navigate(`/chat/${res.data.chatId}`);
+          }
         }
       } catch (err) {
         console.log("MATCH ERROR:", err);
       }
+    }
+  };
+
+  const requestMessage = async (targetId) => {
+    const text = prompt(
+      "Send a message request (up to 3 messages). Your receiver can accept or reject it."
+    );
+
+    if (!text || !text.trim()) return;
+
+    try {
+      await API.post(`/api/message-request/${targetId}`, {
+        text: text.trim(),
+      });
+      alert("✅ Message request sent!");
+    } catch (err) {
+      console.log("REQUEST ERROR:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Failed to send request");
     }
   };
 
@@ -58,12 +90,21 @@ export default function Home() {
           <h2 style={styles.logoText}>SwipeUp</h2>
         </div>
 
-        <button
-          style={styles.settingsBtn}
-          onClick={() => navigate("/settings")}
-        >
-          ⚙️
-        </button>
+        <div style={styles.topButtons}>
+          <button
+            style={styles.settingsBtn}
+            onClick={() => navigate("/requests")}
+          >
+            📩
+          </button>
+
+          <button
+            style={styles.settingsBtn}
+            onClick={() => navigate("/settings")}
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
 
       {/* CARDS */}
@@ -75,6 +116,7 @@ export default function Home() {
               user={user}
               index={index}
               swipe={swipe}
+              requestMessage={requestMessage}
             />
           ))
         ) : (
@@ -82,6 +124,31 @@ export default function Home() {
             <h2>No More Profiles</h2>
             <p>Come back later for more people.</p>
           </div>
+        )}
+      </div>
+
+      <div style={styles.momentsSection}>
+        <h3 style={styles.sectionTitle}>Latest Posts</h3>
+        {moments.length > 0 ? (
+          moments.map((m) => (
+            <div key={m._id} style={styles.momentCard}>
+              {m.image ? (
+                <img
+                  src={m.image}
+                  alt="Moment"
+                  style={styles.momentImage}
+                />
+              ) : (
+                <div style={styles.momentImagePlaceholder} />
+              )}
+              <div style={styles.momentInfo}>
+                <div style={styles.momentUser}>{m.user?.name || "User"}</div>
+                <div style={styles.momentCaption}>{m.caption || "Shared a moment"}</div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p style={styles.emptyMoments}>No posts yet. Check back later.</p>
         )}
       </div>
 
@@ -99,7 +166,7 @@ export default function Home() {
 }
 
 /* ================= SWIPE CARD ================= */
-function SwipeCard({ user, index, swipe }) {
+function SwipeCard({ user, index, swipe, requestMessage }) {
   const x = useMotionValue(0);
 
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
@@ -114,7 +181,7 @@ function SwipeCard({ user, index, swipe }) {
   return (
     <motion.div
       drag="x"
-      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.75}
       onDragEnd={handleDragEnd}
       whileTap={{ scale: 1.03 }}
       style={{
@@ -139,7 +206,15 @@ function SwipeCard({ user, index, swipe }) {
       </motion.div>
 
       <div style={styles.overlay}>
-        <h2 style={styles.name}>{user.name}</h2>
+        <div style={styles.overlayHeader}>
+          <h2 style={styles.name}>{user.name}</h2>
+          <button
+            style={styles.requestBtn}
+            onClick={() => requestMessage(user._id)}
+          >
+            💬 Request
+          </button>
+        </div>
         <p style={styles.bio}>{user.bio || "No bio yet"}</p>
       </div>
     </motion.div>
@@ -185,6 +260,11 @@ const styles = {
     color: "#ff4458",
     fontWeight: "700",
     fontSize: 26,
+  },
+
+  topButtons: {
+    display: "flex",
+    gap: 10,
   },
 
   settingsBtn: {
@@ -270,6 +350,80 @@ const styles = {
   emptyBox: {
     textAlign: "center",
     color: "#555",
+  },
+
+  momentsSection: {
+    padding: 16,
+    margin: "0 10px 12px",
+    background: "#fff",
+    borderRadius: 24,
+    boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+  },
+
+  sectionTitle: {
+    margin: "0 0 12px",
+    color: "#ff4458",
+  },
+
+  momentCard: {
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 18,
+    background: "#fafafa",
+  },
+
+  momentImage: {
+    width: 90,
+    height: 90,
+    objectFit: "cover",
+    borderRadius: 18,
+  },
+
+  momentImagePlaceholder: {
+    width: 90,
+    height: 90,
+    borderRadius: 18,
+    background: "#f0f0f0",
+  },
+
+  momentInfo: {
+    flex: 1,
+  },
+
+  momentUser: {
+    margin: 0,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  overlayHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  requestBtn: {
+    padding: "10px 16px",
+    borderRadius: 12,
+    border: "none",
+    background: "rgba(255,255,255,0.9)",
+    color: "#ff4458",
+    fontWeight: "700",
+    cursor: "pointer",
+  },
+
+  momentCaption: {
+    marginTop: 6,
+    color: "#555",
+    fontSize: 14,
+  },
+
+  emptyMoments: {
+    color: "#777",
   },
 
   bottomNav: {

@@ -31,7 +31,10 @@ export default function Matches() {
 
       <div style={styles.grid}>
         {matches.map((match) => {
-          const user = match.users[0];
+          const currentUser = JSON.parse(localStorage.getItem("user")) || {};
+          const otherUser =
+            match.users.find((u) => u._id !== currentUser._id) ||
+            match.users[0];
 
           return (
             <div
@@ -40,14 +43,14 @@ export default function Matches() {
             >
               <img
                 src={
-                  user.profileImage ||
+                  otherUser?.profileImage ||
                   "https://i.pravatar.cc/300"
                 }
                 alt=""
                 style={styles.image}
               />
 
-              <h3>{user.name}</h3>
+              <h3>{otherUser?.name || "Match"}</h3>
 
               <button
                 style={styles.button}

@@ -5,11 +5,15 @@ export default function ProfileSettings() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
   const [profileImage, setProfileImage] = useState("");
   const [image, setImage] = useState(null);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationPending, setVerificationPending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -51,6 +55,8 @@ export default function ProfileSettings() {
       setName(res.data?.name || "");
       setBio(res.data?.bio || "");
       setEmail(res.data?.email || "");
+      setEmailVerified(res.data?.emailVerified || false);
+      setVerificationPending(!res.data?.emailVerified);
       setProfileImage(res.data?.profileImage || "");
     } catch (err) {
       console.log("LOAD ERROR:", err.response?.data || err.message);
@@ -60,27 +66,68 @@ export default function ProfileSettings() {
     }
   };
 
+  const validateEmail = (value) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  };
+
   const saveProfile = async () => {
+    if (!validateEmail(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
     try {
       setSaving(true);
 
       const res = await API.put("/api/user/update", {
         name,
         bio,
+        email,
       });
 
-      setName(res.data?.name || "");
-      setBio(res.data?.bio || "");
-      setEmail(res.data?.email || email);
-      setProfileImage(res.data?.profileImage || profileImage);
+      setName(res.data?.user?.name || "");
+      setBio(res.data?.user?.bio || "");
+      setEmail(res.data?.user?.email || email);
+      setEmailVerified(res.data?.user?.emailVerified || false);
+      setVerificationPending(res.data?.verificationSent || false);
+      setProfileImage(res.data?.user?.profileImage || profileImage);
 
       window.dispatchEvent(new Event("profileUpdated"));
-      alert("✅ Profile updated successfully.");
+      if (res.data?.verificationSent) {
+        alert("✅ Verification code sent to your new email.");
+      } else {
+        alert("✅ Profile updated successfully.");
+      }
     } catch (err) {
       console.log("SAVE ERROR:", err.response?.data || err.message);
-      alert("❌ Failed to update profile.");
+      alert(err.response?.data?.message || "❌ Failed to update profile.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const verifyEmailCode = async () => {
+    if (!verificationCode.trim()) {
+      alert("Please enter the verification code.");
+      return;
+    }
+
+    try {
+      setVerifying(true);
+      await API.post("/api/auth/verify-email", {
+        email,
+        code: verificationCode,
+      });
+
+      setEmailVerified(true);
+      setVerificationPending(false);
+      setVerificationCode("");
+      alert("✅ Email verified successfully.");
+    } catch (err) {
+      console.log("VERIFY ERROR:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "❌ Verification failed.");
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -143,13 +190,18 @@ export default function ProfileSettings() {
         <input
           type="email"
           value={email || ""}
-          disabled
-          style={{
-            ...styles.input,
-            background: "#f3f3f3",
-            cursor: "not-allowed",
-          }}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Your email"
+          style={styles.input}
         />
+
+        <div style={styles.emailStatus}>
+          {emailVerified ? (
+            <span style={styles.verified}>Verified</span>
+          ) : (
+            <span style={styles.pending}>Email verification required</span>
+          )}
+        </div>
 
         <button
           onClick={saveProfile}
@@ -158,6 +210,48 @@ export default function ProfileSettings() {
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
+
+        {verificationPending && (
+          <div style={styles.verifyBox}>
+            <label style={styles.label}>Verification Code</label>
+            <input
+              type="text"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value)}
+              placeholder="Enter code from email"
+              style={styles.input}
+            />
+            <button
+              onClick={verifyEmailCode}
+              disabled={verifying}
+              style={{
+                ...styles.button,
+                background: "#4a90e2",
+                marginTop: 12,
+              }}
+            >
+              {verifying ? "Verifying..." : "Verify Email"}
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  await API.post("/api/auth/resend-verification");
+                  alert("✅ Verification code resent to your email.");
+                } catch (err) {
+                  console.log("RESEND ERROR:", err.response?.data || err.message);
+                  alert(err.response?.data?.message || "Failed to resend verification code.");
+                }
+              }}
+              style={{
+                ...styles.button,
+                background: "#ffa726",
+                marginTop: 12,
+              }}
+            >
+              Resend Code
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -245,5 +339,26 @@ const styles = {
     fontSize: 16,
     fontWeight: "600",
     cursor: "pointer",
+  },
+  emailStatus: {
+    marginTop: 10,
+    marginBottom: 6,
+    fontSize: 14,
+    color: "#555",
+  },
+  verified: {
+    color: "#00b894",
+    fontWeight: "700",
+  },
+  pending: {
+    color: "#ff7f50",
+    fontWeight: "700",
+  },
+  verifyBox: {
+    marginTop: 24,
+    padding: 18,
+    borderRadius: 18,
+    background: "#fafafa",
+    border: "1px solid #e0e0e0",
   },
 };

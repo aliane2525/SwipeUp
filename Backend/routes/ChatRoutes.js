@@ -13,7 +13,25 @@ router.get("/", auth, async (req, res) => {
   try {
     const chats = await Chat.find({
       members: req.user.id,
+    })
+      .populate("members", "name profileImage")
+      .sort({ updatedAt: -1 });
+
+    res.json(chats);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
     });
+  }
+});
+
+router.get("/chats/:userId", auth, async (req, res) => {
+  try {
+    const chats = await Chat.find({
+      members: req.user.id,
+    })
+      .populate("members", "name profileImage")
+      .sort({ updatedAt: -1 });
 
     res.json(chats);
   } catch (err) {

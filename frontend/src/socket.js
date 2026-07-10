@@ -1,20 +1,17 @@
-import { io } from "socket.io-client";
+﻿import { io } from "socket.io-client";
 
-// ======================================================
-// SOCKET CONNECTION
-// ======================================================
+const socketUrl =
+  process.env.REACT_APP_SOCKET_URL ||
+  window.location.origin ||
+  "http://localhost:5000";
 
-const socket = io(
-  process.env.REACT_APP_API_URL ||
-    "http://localhost:5000",
-  {
-    transports: ["websocket"], // important for stability
-    withCredentials: true, // needed for auth cookies later
-    autoConnect: true,
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 1000,
-  }
-);
+const socket = io(socketUrl, {
+  transports: ["websocket"],
+  withCredentials: true,
+  autoConnect: true,
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+});
 
 export default socket;

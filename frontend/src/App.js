@@ -10,11 +10,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Matches from "./pages/Matches";
+import ChatList from "./pages/ChatList";
 import ChatPage from "./pages/ChatPage";
 import VideoCall from "./pages/VideoCall";
 import Notifications from "./pages/Notifications";
 import ProfileSettings from "./pages/ProfileSettings";
 import Moments from "./pages/Moments";
+import Requests from "./pages/Requests";
+import SwipePage from "./pages/SwipePage";
 
 // ======================================================
 // PROTECTED ROUTE
@@ -100,7 +103,7 @@ function App() {
           path="/chat"
           element={
             <ProtectedRoute>
-              <Matches />
+              <ChatList />
             </ProtectedRoute>
           }
         />
@@ -110,6 +113,15 @@ function App() {
           element={
             <ProtectedRoute>
               <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/requests"
+          element={
+            <ProtectedRoute>
+              <Requests />
             </ProtectedRoute>
           }
         />
@@ -154,6 +166,19 @@ function App() {
         />
 
         {/* ================================================= */}
+        {/* SWIPE */}
+        {/* ================================================= */}
+
+        <Route
+          path="/swipe"
+          element={
+            <ProtectedRoute>
+              <SwipePage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================================= */}
         {/* PROFILE SETTINGS */}
         {/* ================================================= */}
 
@@ -170,10 +195,7 @@ function App() {
         {/* FALLBACK */}
         {/* ================================================= */}
 
-        <Route
-          path="*"
-          element={<Navigate to="/" replace />}
-        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

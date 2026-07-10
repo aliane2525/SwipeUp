@@ -18,6 +18,7 @@ const notificationSchema = new mongoose.Schema({
       "message",
       "like",
       "call",
+      "request",
     ],
   },
 
