@@ -6,8 +6,13 @@ import {
 } from "react-router-dom";
 
 // ================= PAGES =================
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 import Home from "./pages/Home";
 import Matches from "./pages/Matches";
 import ChatList from "./pages/ChatList";
@@ -43,8 +48,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* ================================================= */}
-        {/* AUTH */}
+        {/* LOGIN */}
         {/* ================================================= */}
 
         <Route
@@ -58,6 +64,10 @@ function App() {
           }
         />
 
+        {/* ================================================= */}
+        {/* REGISTER */}
+        {/* ================================================= */}
+
         <Route
           path="/register"
           element={
@@ -67,6 +77,24 @@ function App() {
               <Register />
             )
           }
+        />
+
+        {/* ================================================= */}
+        {/* FORGOT PASSWORD */}
+        {/* ================================================= */}
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        {/* ================================================= */}
+        {/* RESET PASSWORD */}
+        {/* ================================================= */}
+
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
         />
 
         {/* ================================================= */}
@@ -96,7 +124,7 @@ function App() {
         />
 
         {/* ================================================= */}
-        {/* CHAT */}
+        {/* CHAT LIST */}
         {/* ================================================= */}
 
         <Route
@@ -108,6 +136,10 @@ function App() {
           }
         />
 
+        {/* ================================================= */}
+        {/* CHAT PAGE */}
+        {/* ================================================= */}
+
         <Route
           path="/chat/:roomId"
           element={
@@ -116,6 +148,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* ================================================= */}
+        {/* REQUESTS */}
+        {/* ================================================= */}
 
         <Route
           path="/requests"
@@ -153,7 +189,7 @@ function App() {
         />
 
         {/* ================================================= */}
-        {/* MOMENTS / STORIES */}
+        {/* MOMENTS */}
         {/* ================================================= */}
 
         <Route
@@ -195,7 +231,11 @@ function App() {
         {/* FALLBACK */}
         {/* ================================================= */}
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+
       </Routes>
     </BrowserRouter>
   );
