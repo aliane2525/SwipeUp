@@ -1,3 +1,6 @@
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 import axios from "axios";
 
 const API = axios.create({
