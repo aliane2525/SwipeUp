@@ -1,6 +1,3 @@
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-
 import axios from "axios";
 
 const API = axios.create({
@@ -9,7 +6,8 @@ const API = axios.create({
     "http://localhost:5000",
 });
 
-// Attach JWT token to every request
+// ================= JWT TOKEN =================
+
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -23,7 +21,8 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle expired/invalid token
+// ================= AUTH ERROR =================
+
 API.interceptors.response.use(
   (response) => response,
   (error) => {
